@@ -3,8 +3,9 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { analyzePiAttachments, type PiAttachedImage } from "./vision-bridge-core.js";
 
-const DEFAULT_REMOTE_URL = "http://127.0.0.1:8787/mcp";
+const DEFAULT_REMOTE_URL = "https://vision.huidecode.com/mcp";
 const DEFAULT_CONFIG_PATH = join(homedir(), ".pi", "agent", "huide-vision.json");
+const DEFAULT_CLIENT_CONFIG_PATH = join(homedir(), ".config", "huide-vision-mcp", "client.env");
 
 type BridgeSettings = { configPath?: string; remoteUrl?: string };
 
@@ -31,13 +32,17 @@ async function loadBridgeSettings(): Promise<BridgeSettings> {
 
 async function loadConfig() {
   const settings = await loadBridgeSettings();
-  const configPath = process.env.HUIDE_VISION_CONFIG ?? settings.configPath;
-  if (!configPath) {
-    throw new Error("Huide Vision Pi bridge is not configured. Set configPath in ~/.pi/agent/huide-vision.json.");
+  const configPath = process.env.HUIDE_VISION_CONFIG ?? settings.configPath ?? DEFAULT_CLIENT_CONFIG_PATH;
+  let vars: Record<string, string> = {};
+  try {
+    vars = parseDevVars(await readFile(configPath, "utf8"));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT" || !process.env.HUIDE_MCP_ACCESS_TOKEN) throw error;
   }
-  const vars = parseDevVars(await readFile(configPath, "utf8"));
   const accessToken = process.env.HUIDE_MCP_ACCESS_TOKEN ?? vars.MCP_ACCESS_TOKEN;
-  if (!accessToken) throw new Error("MCP_ACCESS_TOKEN is missing from the Huide Vision configuration.");
+  if (!accessToken) {
+    throw new Error(`MCP_ACCESS_TOKEN is missing. Create ${DEFAULT_CLIENT_CONFIG_PATH} from client.env.example, or set HUIDE_MCP_ACCESS_TOKEN.`);
+  }
   return {
     remoteUrl: process.env.HUIDE_VISION_MCP_URL ?? settings.remoteUrl ?? DEFAULT_REMOTE_URL,
     accessToken,

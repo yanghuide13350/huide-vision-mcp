@@ -1,7 +1,7 @@
 import { readFile, realpath } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
-import { extname, relative, resolve } from "node:path";
+import { extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/server";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
@@ -9,7 +9,8 @@ import { z } from "zod";
 import { splitImageForInventory } from "./image-tiler.js";
 
 const SERVER_INFO = { name: "huide-vision-local", version: "0.1.0" };
-const DEFAULT_REMOTE_URL = "http://127.0.0.1:8787/mcp";
+const DEFAULT_REMOTE_URL = "https://vision.huidecode.com/mcp";
+const DEFAULT_CLIENT_CONFIG_PATH = join(homedir(), ".config", "huide-vision-mcp", "client.env");
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const RESULT_CACHE_TTL_MS = 10 * 60 * 1_000;
 const MAX_RESULT_CACHE_ENTRIES = 32;
@@ -44,10 +45,17 @@ function parseDevVars(content: string): Record<string, string> {
 }
 
 async function loadConfig(): Promise<AdapterConfig> {
-  const configPath = process.env.HUIDE_VISION_CONFIG ?? resolve(process.cwd(), ".dev.vars");
-  const vars = parseDevVars(await readFile(configPath, "utf8"));
+  const configPath = process.env.HUIDE_VISION_CONFIG ?? DEFAULT_CLIENT_CONFIG_PATH;
+  let vars: Record<string, string> = {};
+  try {
+    vars = parseDevVars(await readFile(configPath, "utf8"));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT" || !process.env.HUIDE_MCP_ACCESS_TOKEN) throw error;
+  }
   const accessToken = process.env.HUIDE_MCP_ACCESS_TOKEN ?? vars.MCP_ACCESS_TOKEN;
-  if (!accessToken) throw new Error("MCP_ACCESS_TOKEN is missing from .dev.vars.");
+  if (!accessToken) {
+    throw new Error(`MCP_ACCESS_TOKEN is missing. Create ${DEFAULT_CLIENT_CONFIG_PATH} from client.env.example, or set HUIDE_MCP_ACCESS_TOKEN.`);
+  }
   return {
     remoteUrl: process.env.HUIDE_VISION_MCP_URL ?? DEFAULT_REMOTE_URL,
     accessToken,

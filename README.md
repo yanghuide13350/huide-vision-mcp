@@ -47,6 +47,45 @@ https://vision.huidecode.com/mcp
 
 健康检查：`https://vision.huidecode.com/health`。
 
+## 给其他人使用（生产客户端配置）
+
+不要复制开发者电脑的绝对路径，也不要把服务端的 `.dev.vars` 或 `SENSENOVA_API_KEY` 发给客户端。每位使用者都应在**自己的电脑**创建独立的私有文件：
+
+```bash
+mkdir -p ~/.config/huide-vision-mcp
+cp client.env.example ~/.config/huide-vision-mcp/client.env
+# 编辑 client.env，只填服务管理员发放的 MCP_ACCESS_TOKEN
+```
+
+客户端默认读取 `~/.config/huide-vision-mcp/client.env`，默认连接生产地址 `https://vision.huidecode.com/mcp`。也可用环境变量 `HUIDE_MCP_ACCESS_TOKEN` 提供令牌，不必建立文件。
+
+Pi 的 `~/.pi/agent/huide-vision.json` 可保持最简：
+
+```json
+{
+  "remoteUrl": "https://vision.huidecode.com/mcp"
+}
+```
+
+Claude Code 的本地适配器配置示例（把路径换成使用者自己的项目路径）：
+
+```json
+{
+  "mcpServers": {
+    "huide-vision": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/Users/使用者用户名/huide-vision-mcp/dist/local-adapter.js"],
+      "env": {
+        "HUIDE_VISION_MCP_URL": "https://vision.huidecode.com/mcp"
+      }
+    }
+  }
+}
+```
+
+**当前授权限制：** Worker 现在只校验一个 `MCP_ACCESS_TOKEN`。因此它适合你本人或受信任的小范围测试；如果要给不受控的外部用户长期使用，下一步应实现“每人一个、可单独撤销”的令牌机制或 Cloudflare Access，不能把你自己的共享令牌公开出去。
+
 ## 客户端注意事项
 
 这是标准远程 Streamable HTTP MCP。客户端必须既支持远程 MCP，又支持把图片附件作为工具参数传入。若某个客户端在模型调用前就拒绝图片附件，MCP 无法拦截该附件；这是客户端能力边界。
@@ -71,15 +110,16 @@ Pi 的图片附件是内存中的 base64 数据，而本项目原有的 `local-a
 pi install "/absolute/path/to/Huide Vision MCP"
 ```
 
-随后在 `~/.pi/agent/huide-vision.json` 创建仅包含路径的配置（不要复制 Token）：
+随后在 `~/.pi/agent/huide-vision.json` 可选择覆盖默认配置路径和生产地址（不要复制 Token）：
 
 ```json
 {
-  "configPath": "/absolute/path/to/Huide Vision MCP/.dev.vars"
+  "configPath": "/Users/使用者用户名/.config/huide-vision-mcp/client.env",
+  "remoteUrl": "https://vision.huidecode.com/mcp"
 }
 ```
 
-本地 Worker 不在默认端口时，可附加 `remoteUrl`。启动本地 Worker 后，在 Pi 中粘贴或拖入开发截图即可；Pi 终端会输出 `[Huide Vision] analyzing ...`、成功或失败日志。
+若要测试本地 Worker，可把 `remoteUrl` 临时改为本机地址。生产环境中，在 Pi 粘贴或拖入开发截图即可；Pi 终端会输出 `[Huide Vision] analyzing ...`、成功或失败日志。
 
 ## 验证
 
