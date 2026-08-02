@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "bin": {
-    "huide-vision-mcp": "./dist/local-adapter.js"
+    "huide-vision-mcp": "dist/local-adapter.js"
   },
   "files": [
     "dist/local-adapter.js",
@@ -23,7 +23,9 @@
     "access": "public"
   },
   "pi": {
-    "extensions": ["./pi/huide-vision-bridge.ts"]
+    "extensions": [
+      "./pi/huide-vision-bridge.ts"
+    ]
   },
   "scripts": {
     "dev": "wrangler dev",
