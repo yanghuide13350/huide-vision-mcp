@@ -7,7 +7,7 @@ const DEFAULT_REMOTE_URL = "https://vision.huidecode.com/mcp";
 const DEFAULT_CONFIG_PATH = join(homedir(), ".pi", "agent", "huide-vision.json");
 const DEFAULT_CLIENT_CONFIG_PATH = join(homedir(), ".config", "huide-vision-mcp", "client.env");
 
-type BridgeSettings = { configPath?: string; remoteUrl?: string };
+type BridgeSettings = { configPath?: string; remoteUrl?: string; accessToken?: string };
 
 function parseDevVars(content: string): Record<string, string> {
   return Object.fromEntries(
@@ -39,7 +39,7 @@ async function loadConfig() {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT" || !process.env.HUIDE_MCP_ACCESS_TOKEN) throw error;
   }
-  const accessToken = process.env.HUIDE_MCP_ACCESS_TOKEN ?? vars.MCP_ACCESS_TOKEN;
+  const accessToken = process.env.HUIDE_MCP_ACCESS_TOKEN ?? settings.accessToken ?? vars.MCP_ACCESS_TOKEN;
   if (!accessToken) {
     throw new Error(`MCP_ACCESS_TOKEN is missing. Create ${DEFAULT_CLIENT_CONFIG_PATH} from client.env.example, or set HUIDE_MCP_ACCESS_TOKEN.`);
   }
