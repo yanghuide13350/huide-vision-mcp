@@ -4,6 +4,9 @@
   "private": true,
   "description": "A remote MCP server that gives text-only developer agents screenshot understanding.",
   "type": "module",
+  "pi": {
+    "extensions": ["./pi/huide-vision-bridge.ts"]
+  },
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",

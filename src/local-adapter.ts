@@ -21,7 +21,7 @@ const MIME_BY_EXTENSION: Record<string, string> = {
   ".gif": "image/gif",
 };
 
-type AdapterConfig = { remoteUrl: string; accessToken: string };
+export type AdapterConfig = { remoteUrl: string; accessToken: string };
 type CachedVisionResult = { expiresAt: number; result: Promise<string> };
 
 const visionResultCache = new Map<string, CachedVisionResult>();

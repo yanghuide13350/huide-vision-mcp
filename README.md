@@ -61,6 +61,26 @@ https://vision.huidecode.com/mcp
 }
 ```
 
+## Pi（文本模型）自动截图分析
+
+Pi 的图片附件是内存中的 base64 数据，而本项目原有的 `local-adapter` 只允许读取 Claude Code 的附件路径。为避免 Pi 的文本模型因看不到图片而拒绝调用或猜测图片内容，本项目提供了 Pi 专用桥接扩展：它会在 Pi 收到图片时直接调用同一个 Worker，再把分析结果作为文本交给 Pi 模型。Worker 返回 401 或任何错误时，Pi 会中止该轮，而不是让文本模型继续猜图。
+
+安装本项目的 Pi 扩展：
+
+```bash
+pi install "/absolute/path/to/Huide Vision MCP"
+```
+
+随后在 `~/.pi/agent/huide-vision.json` 创建仅包含路径的配置（不要复制 Token）：
+
+```json
+{
+  "configPath": "/absolute/path/to/Huide Vision MCP/.dev.vars"
+}
+```
+
+本地 Worker 不在默认端口时，可附加 `remoteUrl`。启动本地 Worker 后，在 Pi 中粘贴或拖入开发截图即可；Pi 终端会输出 `[Huide Vision] analyzing ...`、成功或失败日志。
+
 ## 验证
 
 ```bash
