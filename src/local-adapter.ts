@@ -1,4 +1,7 @@
+#!/usr/bin/env node
+
 import { readFile, realpath } from "node:fs/promises";
+import { realpathSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { extname, join, relative, resolve } from "node:path";
@@ -213,7 +216,8 @@ function buildServer(): McpServer {
   return server;
 }
 
-const isMain = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
+const isMain = process.argv[1]
+  && realpathSync(fileURLToPath(import.meta.url)) === realpathSync(resolve(process.argv[1]));
 if (isMain) {
   void serveStdio(buildServer, { onerror: error => console.error("Huide Vision adapter error:", error) });
   console.error("Huide Vision local adapter is running on stdio.");

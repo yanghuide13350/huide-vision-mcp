@@ -1,9 +1,27 @@
 {
   "name": "huide-vision-mcp",
   "version": "0.1.0",
-  "private": true,
   "description": "A remote MCP server that gives text-only developer agents screenshot understanding.",
   "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "huide-vision-mcp": "./dist/local-adapter.js"
+  },
+  "files": [
+    "dist/local-adapter.js",
+    "dist/image-tiler.js",
+    "pi",
+    "src/local-adapter.ts",
+    "src/image-tiler.ts",
+    "README.md",
+    "client.env.example"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "pi": {
     "extensions": ["./pi/huide-vision-bridge.ts"]
   },
@@ -12,6 +30,8 @@
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "build:local": "tsc -p tsconfig.local.json",
+    "prepack": "npm run build:local",
+    "prepublishOnly": "npm run check && npm test",
     "check": "tsc --noEmit",
     "test": "vitest run"
   },

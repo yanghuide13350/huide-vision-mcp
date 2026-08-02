@@ -67,15 +67,20 @@ Pi 的 `~/.pi/agent/huide-vision.json` 可保持最简：
 }
 ```
 
-Claude Code 的本地适配器配置示例（把路径换成使用者自己的项目路径）：
+先安装本地适配器：
+
+```bash
+npm install -g huide-vision-mcp
+```
+
+Claude Code 配置示例：
 
 ```json
 {
   "mcpServers": {
     "huide-vision": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/Users/使用者用户名/huide-vision-mcp/dist/local-adapter.js"],
+      "command": "huide-vision-mcp",
       "env": {
         "HUIDE_VISION_MCP_URL": "https://vision.huidecode.com/mcp"
       }
@@ -84,16 +89,7 @@ Claude Code 的本地适配器配置示例（把路径换成使用者自己的�
 }
 ```
 
-`local-adapter.js` 是使用者本机运行的程序，因此每位 Claude Code 使用者都要先完成一次本地安装和构建：
-
-```bash
-git clone https://github.com/yanghuide13350/huide-vision-mcp.git
-cd huide-vision-mcp
-npm install
-npm run build:local
-```
-
-然后把上面 `args` 中的路径改成**该用户克隆目录**下的 `dist/local-adapter.js`。这个本机路径无法统一为你的路径，也不应写入仓库。
+安装完成后，`huide-vision-mcp` 会成为系统命令；Claude Code 不需要克隆仓库、构建项目或填写任何本机路径。
 
 **当前授权限制：** Worker 现在只校验一个 `MCP_ACCESS_TOKEN`。因此它适合你本人或受信任的小范围测试；如果要给不受控的外部用户长期使用，下一步应实现“每人一个、可单独撤销”的令牌机制或 Cloudflare Access，不能把你自己的共享令牌公开出去。
 
@@ -118,15 +114,15 @@ Pi 的图片附件是内存中的 base64 数据，而本项目原有的 `local-a
 安装本项目的 Pi 扩展：
 
 ```bash
-pi install "/absolute/path/to/Huide Vision MCP"
+pi install npm:huide-vision-mcp
 ```
 
-随后在 `~/.pi/agent/huide-vision.json` 可选择覆盖默认配置路径和生产地址（不要复制 Token）：
+随后在 `~/.pi/agent/huide-vision.json` 配置生产地址和你的项目访问令牌：
 
 ```json
 {
-  "configPath": "/Users/使用者用户名/.config/huide-vision-mcp/client.env",
-  "remoteUrl": "https://vision.huidecode.com/mcp"
+  "remoteUrl": "https://vision.huidecode.com/mcp",
+  "accessToken": "你收到的 MCP_ACCESS_TOKEN"
 }
 ```
 
