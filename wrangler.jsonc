@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "huide-vision-mcp",
   "main": "src/index.ts",
+  "workers_dev": true,
   "compatibility_date": "2026-07-28",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
