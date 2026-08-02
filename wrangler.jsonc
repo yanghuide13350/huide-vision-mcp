@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "huide-vision-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "vars": {
+    "SENSENOVA_BASE_URL": "https://token.sensenova.cn/v1",
+    "SENSENOVA_MODEL": "sensenova-6.7-flash-lite",
+    "MAX_IMAGE_BYTES": "10485760"
+  }
+}

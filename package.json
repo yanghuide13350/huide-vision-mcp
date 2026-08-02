@@ -1,0 +1,26 @@
+{
+  "name": "huide-vision-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A remote MCP server that gives text-only developer agents screenshot understanding.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types",
+    "build:local": "tsc -p tsconfig.local.json",
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
+    "sharp": "^0.35.3",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.0.0"
+  }
+}
