@@ -8,6 +8,12 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
+  "routes": [
+    {
+      "pattern": "vision.huidecode.com",
+      "custom_domain": true
+    }
+  ],
   "secrets": {
     "required": ["SENSENOVA_API_KEY", "MCP_ACCESS_TOKEN"]
   },
